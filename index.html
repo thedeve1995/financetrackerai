@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CashFlow — Pencatat Keuangan</title>
+    <meta name="description" content="Aplikasi pencatat keuangan pribadi yang elegan dan mudah digunakan.">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <div class="logo">
+                <div class="logo-icon"><i class="fas fa-wallet"></i></div>
+                <span>Cash<span class="text-accent">Flow</span></span>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="date-display" id="currentDate"></div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Summary Cards -->
+        <section class="summary-section">
+            <div class="summary-card balance-card">
+                <div class="card-icon">
+                    <i class="fas fa-coins"></i>
+                </div>
+                <div class="card-info">
+                    <span class="card-label">Saldo</span>
+                    <span class="card-amount" id="totalBalance">Rp 0</span>
+                </div>
+            </div>
+            <div class="summary-card income-card">
+                <div class="card-icon">
+                    <i class="fas fa-arrow-down"></i>
+                </div>
+                <div class="card-info">
+                    <span class="card-label">Pemasukan</span>
+                    <span class="card-amount" id="totalIncome">Rp 0</span>
+                </div>
+            </div>
+            <div class="summary-card expense-card">
+                <div class="card-icon">
+                    <i class="fas fa-arrow-up"></i>
+                </div>
+                <div class="card-info">
+                    <span class="card-label">Pengeluaran</span>
+                    <span class="card-amount" id="totalExpense">Rp 0</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Content Grid -->
+        <section class="content-grid">
+            <!-- Left: Form + Chart -->
+            <div class="left-panel">
+                <!-- Add Transaction Form -->
+                <div class="panel form-panel">
+                    <h2 class="panel-title"><i class="fas fa-plus-circle"></i> Tambah Transaksi</h2>
+                    <form id="transactionForm">
+                        <div class="form-group">
+                            <label for="description">Deskripsi</label>
+                            <input type="text" id="description" placeholder="Contoh: Gaji, Makan siang..." required>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="amount">Jumlah (Rp)</label>
+                                <input type="number" id="amount" placeholder="0" min="1" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="category">Kategori</label>
+                                <select id="category" required>
+                                    <option value="">Pilih...</option>
+                                    <optgroup label="Pemasukan">
+                                        <option value="Gaji">💰 Gaji</option>
+                                        <option value="Freelance">💻 Freelance</option>
+                                        <option value="Investasi">📈 Investasi</option>
+                                        <option value="Lainnya (Masuk)">🎁 Lainnya</option>
+                                    </optgroup>
+                                    <optgroup label="Pengeluaran">
+                                        <option value="Makanan">🍔 Makanan</option>
+                                        <option value="Transportasi">🚗 Transportasi</option>
+                                        <option value="Belanja">🛒 Belanja</option>
+                                        <option value="Hiburan">🎬 Hiburan</option>
+                                        <option value="Tagihan">📄 Tagihan</option>
+                                        <option value="Kesehatan">💊 Kesehatan</option>
+                                        <option value="Pendidikan">📚 Pendidikan</option>
+                                        <option value="Lainnya (Keluar)">📦 Lainnya</option>
+                                    </optgroup>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="date">Tanggal</label>
+                                <input type="date" id="date" required>
+                            </div>
+                            <div class="form-group type-toggle">
+                                <label>Tipe</label>
+                                <div class="toggle-buttons">
+                                    <button type="button" class="toggle-btn active" data-type="income" id="toggleIncome">
+                                        <i class="fas fa-arrow-down"></i> Masuk
+                                    </button>
+                                    <button type="button" class="toggle-btn" data-type="expense" id="toggleExpense">
+                                        <i class="fas fa-arrow-up"></i> Keluar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-submit" id="submitBtn">
+                            <i class="fas fa-plus"></i> Tambah Transaksi
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Chart Panel -->
+                <div class="panel chart-panel">
+                    <h2 class="panel-title"><i class="fas fa-chart-pie"></i> Ringkasan</h2>
+                    <div class="chart-container">
+                        <canvas id="expenseChart"></canvas>
+                        <div class="chart-center-text" id="chartCenterText">
+                            <span class="chart-total-label">Total</span>
+                            <span class="chart-total-amount" id="chartTotalAmount">Rp 0</span>
+                        </div>
+                    </div>
+                    <div class="chart-legend" id="chartLegend"></div>
+                </div>
+            </div>
+
+            <!-- Right: Transaction History -->
+            <div class="right-panel">
+                <div class="panel history-panel">
+                    <div class="history-header">
+                        <h2 class="panel-title"><i class="fas fa-history"></i> Riwayat Transaksi</h2>
+                        <div class="filter-controls">
+                            <select id="filterType" class="filter-select">
+                                <option value="all">Semua</option>
+                                <option value="income">Pemasukan</option>
+                                <option value="expense">Pengeluaran</option>
+                            </select>
+                            <button class="btn-clear" id="clearAllBtn" title="Hapus Semua">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="transaction-list" id="transactionList">
+                        <div class="empty-state" id="emptyState">
+                            <i class="fas fa-receipt"></i>
+                            <p>Belum ada transaksi.</p>
+                            <span>Mulai catat keuanganmu sekarang!</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Toast Notification -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal-overlay" id="deleteModal">
+        <div class="modal-box">
+            <div class="modal-icon"><i class="fas fa-exclamation-triangle"></i></div>
+            <h3>Hapus Transaksi?</h3>
+            <p>Tindakan ini tidak bisa dibatalkan.</p>
+            <div class="modal-actions">
+                <button class="btn-modal btn-cancel" id="cancelDeleteBtn">Batal</button>
+                <button class="btn-modal btn-confirm-delete" id="confirmDeleteBtn">Hapus</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Clear All Confirmation Modal -->
+    <div class="modal-overlay" id="clearModal">
+        <div class="modal-box">
+            <div class="modal-icon warning"><i class="fas fa-trash-alt"></i></div>
+            <h3>Hapus Semua Data?</h3>
+            <p>Semua transaksi akan dihapus secara permanen.</p>
+            <div class="modal-actions">
+                <button class="btn-modal btn-cancel" id="cancelClearBtn">Batal</button>
+                <button class="btn-modal btn-confirm-delete" id="confirmClearBtn">Ya, Hapus Semua</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAXEDh3wb2qZ9qO5VrbV4VhStlqMUf7vmg",
+            authDomain: "newproject-fbb7e.firebaseapp.com",
+            databaseURL: "https://newproject-fbb7e-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "newproject-fbb7e",
+            storageBucket: "newproject-fbb7e.firebasestorage.app",
+            messagingSenderId: "726576406795",
+            appId: "1:726576406795:web:a083e42e09e91a4505020e"
+        };
+        firebase.initializeApp(firebaseConfig);
+        window.db = firebase.firestore();
+    </script>
+    <!-- Custom JS -->
+    <script src="js/app.js"></script>
+</body>
+</html>
