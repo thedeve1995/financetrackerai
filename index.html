@@ -3,176 +3,367 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CashFlow — Pencatat Keuangan</title>
-    <meta name="description" content="Aplikasi pencatat keuangan pribadi yang elegan dan mudah digunakan.">
-    <!-- Google Fonts -->
+    <title>BukuMoney — Keuangan Keluarga</title>
+    <meta name="description" content="Aplikasi pencatat keuangan keluarga yang elegan dan mudah digunakan.">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0b1020">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <!-- Font Awesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="/src/style.css">
 </head>
 <body>
-    <!-- Header -->
-    <header class="header">
-        <div class="header-left">
-            <div class="logo">
-                <div class="logo-icon"><i class="fas fa-wallet"></i></div>
-                <span>Cash<span class="text-accent">Flow</span></span>
+    <div class="app-bg">
+    <div class="shell">
+        <!-- ============ SIDEBAR (desktop) ============ -->
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-mark"><i class="fas fa-coins"></i></div>
+                <div class="brand-name">Buku<b>Money</b></div>
             </div>
-        </div>
-        <div class="header-right">
-            <div class="date-display" id="currentDate"></div>
-        </div>
-    </header>
 
-    <!-- Main Content -->
-    <main class="main-content">
-        <!-- Summary Cards -->
-        <section class="summary-section">
-            <div class="summary-card balance-card">
-                <div class="card-icon">
-                    <i class="fas fa-coins"></i>
-                </div>
-                <div class="card-info">
-                    <span class="card-label">Saldo</span>
-                    <span class="card-amount" id="totalBalance">Rp 0</span>
-                </div>
-            </div>
-            <div class="summary-card income-card">
-                <div class="card-icon">
-                    <i class="fas fa-arrow-down"></i>
-                </div>
-                <div class="card-info">
-                    <span class="card-label">Pemasukan</span>
-                    <span class="card-amount" id="totalIncome">Rp 0</span>
-                </div>
-            </div>
-            <div class="summary-card expense-card">
-                <div class="card-icon">
-                    <i class="fas fa-arrow-up"></i>
-                </div>
-                <div class="card-info">
-                    <span class="card-label">Pengeluaran</span>
-                    <span class="card-amount" id="totalExpense">Rp 0</span>
-                </div>
-            </div>
-        </section>
+            <div class="nav-item active" data-tab="dashboard"><i class="fas fa-home"></i> Beranda</div>
+            <div class="nav-item" data-tab="wallets"><i class="fas fa-wallet"></i> Dompet</div>
+            <div class="nav-item" data-tab="assets"><i class="fas fa-layer-group"></i> Aset</div>
+            <div class="nav-item" data-tab="history"><i class="fas fa-list-ul"></i> Transaksi</div>
 
-        <!-- Content Grid -->
-        <section class="content-grid">
-            <!-- Left: Form + Chart -->
-            <div class="left-panel">
-                <!-- Add Transaction Form -->
-                <div class="panel form-panel">
-                    <h2 class="panel-title"><i class="fas fa-plus-circle"></i> Tambah Transaksi</h2>
-                    <form id="transactionForm">
-                        <div class="form-group">
-                            <label for="description">Deskripsi</label>
-                            <input type="text" id="description" placeholder="Contoh: Gaji, Makan siang..." required>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="amount">Jumlah (Rp)</label>
-                                <input type="number" id="amount" placeholder="0" min="1" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="category">Kategori</label>
-                                <select id="category" required>
-                                    <option value="">Pilih...</option>
-                                    <optgroup label="Pemasukan">
-                                        <option value="Gaji">💰 Gaji</option>
-                                        <option value="Freelance">💻 Freelance</option>
-                                        <option value="Investasi">📈 Investasi</option>
-                                        <option value="Lainnya (Masuk)">🎁 Lainnya</option>
-                                    </optgroup>
-                                    <optgroup label="Pengeluaran">
-                                        <option value="Makanan">🍔 Makanan</option>
-                                        <option value="Transportasi">🚗 Transportasi</option>
-                                        <option value="Belanja">🛒 Belanja</option>
-                                        <option value="Hiburan">🎬 Hiburan</option>
-                                        <option value="Tagihan">📄 Tagihan</option>
-                                        <option value="Kesehatan">💊 Kesehatan</option>
-                                        <option value="Pendidikan">📚 Pendidikan</option>
-                                        <option value="Lainnya (Keluar)">📦 Lainnya</option>
-                                    </optgroup>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="date">Tanggal</label>
-                                <input type="date" id="date" required>
-                            </div>
-                            <div class="form-group type-toggle">
-                                <label>Tipe</label>
-                                <div class="toggle-buttons">
-                                    <button type="button" class="toggle-btn active" data-type="income" id="toggleIncome">
-                                        <i class="fas fa-arrow-down"></i> Masuk
-                                    </button>
-                                    <button type="button" class="toggle-btn" data-type="expense" id="toggleExpense">
-                                        <i class="fas fa-arrow-up"></i> Keluar
-                                    </button>
+            <div class="nav-label-grp">Lainnya</div>
+            <div class="nav-item" data-tab="goals"><i class="fas fa-bullseye"></i> Target</div>
+            <div class="nav-item" data-tab="debts"><i class="fas fa-hand-holding-usd"></i> Hutang</div>
+            <div class="nav-item" data-tab="add"><i class="fas fa-plus-circle"></i> Catat</div>
+
+            <div class="sidebar-foot">
+                <div class="user-chip">
+                    <div class="avatar" id="userAvatar">BM</div>
+                    <div style="min-width:0; flex:1;">
+                        <div class="user-name" id="userName">Keuangan Saya</div>
+                        <div class="user-sub" id="userEmailLabel">BukuMoney</div>
+                    </div>
+                    <button class="logout-btn" id="logoutBtn" title="Keluar" style="display:none;">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- ============ MAIN ============ -->
+        <main class="main">
+            <div class="main-inner">
+                <div class="topbar">
+                    <div>
+                        <h1 id="pageTitle">Halo 👋</h1>
+                        <div class="sub" id="pageSub">Ringkasan keuangan keluargamu hari ini</div>
+                    </div>
+                    <div class="topbar-actions">
+                        <div class="date-chip"><i class="fas fa-calendar-day"></i><span id="currentDate"></span></div>
+                        <button class="icon-btn only-mobile" id="logoutBtnTop" title="Keluar"><i class="fas fa-sign-out-alt"></i></button>
+                        <button class="icon-btn" id="notifBtn" title="Notifikasi"><i class="fas fa-bell"></i></button>
+                        <button class="btn btn-primary" data-tab="add"><i class="fas fa-plus"></i> Catat</button>
+                    </div>
+                </div>
+
+                <!-- ============ TAB: BERANDA (dashboard) ============ -->
+                <div id="tab-dashboard" class="tab-section active">
+                    <div class="hero-grid">
+                        <div class="card hero-card">
+                            <div class="hero-glow"></div>
+                            <div class="hero-inner">
+                                <div class="hero-top">
+                                    <span class="eyebrow">Total Kekayaan</span>
+                                    <button class="eye-btn" id="toggleHideBalance" title="Sembunyikan saldo"><i class="fas fa-eye"></i></button>
+                                </div>
+                                <div class="hero-amount-row">
+                                    <span class="hero-num num" id="totalWealth">Rp 0</span>
+                                    <span class="chip pos"><i class="fas fa-arrow-up"></i> Kekayaan bersih</span>
+                                </div>
+                                <div class="hero-sub">Saldo dompet + aset + piutang − hutang · diperbarui hari ini</div>
+                                <div class="qa-row">
+                                    <button class="qa" data-tab="add"><span class="qa-ic"><i class="fas fa-plus"></i></span>Catat</button>
+                                    <button class="qa" data-tab="wallets"><span class="qa-ic"><i class="fas fa-wallet"></i></span>Dompet</button>
+                                    <button class="qa" data-tab="goals"><span class="qa-ic"><i class="fas fa-bullseye"></i></span>Target</button>
+                                    <button class="qa" data-tab="debts"><span class="qa-ic"><i class="fas fa-hand-holding-usd"></i></span>Hutang</button>
                                 </div>
                             </div>
                         </div>
-                        <button type="submit" class="btn-submit" id="submitBtn">
-                            <i class="fas fa-plus"></i> Tambah Transaksi
-                        </button>
-                    </form>
-                </div>
-
-                <!-- Chart Panel -->
-                <div class="panel chart-panel">
-                    <h2 class="panel-title"><i class="fas fa-chart-pie"></i> Ringkasan</h2>
-                    <div class="chart-container">
-                        <canvas id="expenseChart"></canvas>
-                        <div class="chart-center-text" id="chartCenterText">
-                            <span class="chart-total-label">Total</span>
-                            <span class="chart-total-amount" id="chartTotalAmount">Rp 0</span>
+                        <div class="hero-side">
+                            <div class="card card-pad stat-card">
+                                <div class="stat-top"><div class="icon-tile sm"><i class="fas fa-wallet"></i></div></div>
+                                <div>
+                                    <div class="eyebrow">Total Saldo</div>
+                                    <span class="stat-num num" id="totalBalance">Rp 0</span>
+                                </div>
+                            </div>
+                            <div class="card card-pad stat-card">
+                                <div class="stat-top"><div class="icon-tile sm income"><i class="fas fa-arrow-down"></i></div></div>
+                                <div>
+                                    <div class="eyebrow">Pemasukan</div>
+                                    <span class="stat-num num" id="totalIncome">Rp 0</span>
+                                </div>
+                            </div>
+                            <div class="card card-pad stat-card">
+                                <div class="stat-top"><div class="icon-tile sm expense"><i class="fas fa-arrow-up"></i></div></div>
+                                <div>
+                                    <div class="eyebrow">Pengeluaran</div>
+                                    <span class="stat-num num" id="totalExpense">Rp 0</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="chart-legend" id="chartLegend"></div>
-                </div>
-            </div>
 
-            <!-- Right: Transaction History -->
-            <div class="right-panel">
-                <div class="panel history-panel">
-                    <div class="history-header">
-                        <h2 class="panel-title"><i class="fas fa-history"></i> Riwayat Transaksi</h2>
+                    <div class="card card-pad ai-card" style="margin-top: 28px;">
+                        <div class="card-head">
+                            <h2 class="card-title"><span class="ai-spark">✦</span> Asisten Keuangan AI</h2>
+                            <button class="btn btn-sm" id="aiInsightBtn"><i class="fas fa-wand-magic-sparkles"></i> Buat Ringkasan</button>
+                        </div>
+                        <div id="aiInsightContent" class="ai-insight ai-insight-empty">Dapatkan analisis singkat &amp; saran dari data keuanganmu — klik "Buat Ringkasan".</div>
+                    </div>
+
+                    <div class="section-head">
+                        <h2><i class="fas fa-wallet"></i> Dompet Saya</h2>
+                        <span class="link" data-tab="wallets">Lihat semua <i class="fas fa-chevron-right"></i></span>
+                    </div>
+                    <div class="wallet-scroll" id="dashWalletsPreview">
+                        <div class="empty-state-small"><i class="fas fa-spinner fa-spin"></i></div>
+                    </div>
+
+                    <div class="two-col" style="margin-top: 28px;">
+                        <div class="card card-pad">
+                            <div class="card-head">
+                                <h2 class="card-title">Pengeluaran per Kategori</h2>
+                                <span class="muted-sm">Semua waktu</span>
+                            </div>
+                            <div class="chart-wrap">
+                                <div class="chart-container">
+                                    <canvas id="expenseChart"></canvas>
+                                    <div class="chart-center-text">
+                                        <span class="chart-total-label">Total Keluar</span>
+                                        <span class="chart-total-amount num" id="chartTotalAmount">Rp 0</span>
+                                    </div>
+                                </div>
+                                <div class="chart-legend" id="chartLegend"></div>
+                            </div>
+                        </div>
+                        <div class="card card-pad">
+                            <div class="card-head">
+                                <h2 class="card-title">Transaksi Terakhir</h2>
+                                <span class="link" data-tab="history">Lihat semua <i class="fas fa-chevron-right"></i></span>
+                            </div>
+                            <div class="recent-list" id="dashRecentList">
+                                <div class="empty-state-small"><i class="fas fa-spinner fa-spin"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ============ TAB: DOMPET (wallets) ============ -->
+                <div id="tab-wallets" class="tab-section">
+                    <div class="card card-pad balance-banner">
+                        <div>
+                            <div class="eyebrow" style="margin-bottom: 8px;">Total saldo di semua dompet</div>
+                            <span class="hero-num num" id="walletsTotal">Rp 0</span>
+                        </div>
+                        <button class="btn btn-primary" id="addWalletBtn"><i class="fas fa-plus"></i> Tambah Dompet</button>
+                    </div>
+
+                    <div class="card card-pad" style="margin-bottom: 26px;">
+                        <div class="card-head">
+                            <h2 class="card-title">Alokasi Dana</h2>
+                            <span class="muted-sm">Distribusi saldo</span>
+                        </div>
+                        <div id="allocContent">
+                            <div class="alloc-bar"><div style="width:100%; background: var(--bg-3);"></div></div>
+                        </div>
+                    </div>
+
+                    <div class="section-head" style="margin-top: 0;">
+                        <h2><i class="fas fa-wallet"></i> Semua Dompet</h2>
+                    </div>
+                    <div class="wallet-grid" id="walletsContainer">
+                        <div class="empty-state-small"><i class="fas fa-spinner fa-spin"></i></div>
+                    </div>
+                </div>
+
+                <!-- ============ TAB: ASET (assets) ============ -->
+                <div id="tab-assets" class="tab-section">
+                    <div class="card card-pad balance-banner">
+                        <div>
+                            <div class="eyebrow" style="margin-bottom: 8px;">Total Nilai Aset</div>
+                            <span class="hero-num num" id="assetsTotal">Rp 0</span>
+                        </div>
+                        <button class="btn btn-primary" id="addAssetBtn"><i class="fas fa-plus"></i> Tambah Aset</button>
+                    </div>
+
+                    <div class="section-head" style="margin-top: 0;">
+                        <h2><i class="fas fa-layer-group"></i> Daftar Aset (Tetap & Tumbuh)</h2>
+                    </div>
+                    <div class="asset-list" id="assetsContainer">
+                        <div class="empty-state-small"><i class="fas fa-spinner fa-spin"></i></div>
+                    </div>
+                </div>
+
+                <!-- ============ TAB: TRANSAKSI (history) ============ -->
+                <div id="tab-history" class="tab-section">
+                    <div class="txn-summary">
+                        <div class="card card-pad mini-stat">
+                            <div class="icon-tile income"><i class="fas fa-arrow-down"></i></div>
+                            <div><div class="eyebrow">Total Masuk</div><span class="ms-num num" id="histIncome">Rp 0</span></div>
+                        </div>
+                        <div class="card card-pad mini-stat">
+                            <div class="icon-tile expense"><i class="fas fa-arrow-up"></i></div>
+                            <div><div class="eyebrow">Total Keluar</div><span class="ms-num num" id="histExpense">Rp 0</span></div>
+                        </div>
+                        <div class="card card-pad mini-stat">
+                            <div class="icon-tile neutral"><i class="fas fa-exchange-alt"></i></div>
+                            <div><div class="eyebrow">Selisih</div><span class="ms-num num" id="histDiff">Rp 0</span></div>
+                        </div>
+                    </div>
+
+                    <div class="txn-toolbar">
+                        <div class="seg" id="txnFilterSeg">
+                            <button type="button" class="seg-btn on" data-filter="all">Semua</button>
+                            <button type="button" class="seg-btn" data-filter="income">Masuk</button>
+                            <button type="button" class="seg-btn" data-filter="expense">Keluar</button>
+                            <button type="button" class="seg-btn" data-filter="transfer">Transfer</button>
+                        </div>
                         <div class="filter-controls">
-                            <select id="filterType" class="filter-select">
+                            <select id="filterType" class="filter-select visually-hidden" aria-hidden="true" tabindex="-1">
                                 <option value="all">Semua</option>
                                 <option value="income">Pemasukan</option>
                                 <option value="expense">Pengeluaran</option>
+                                <option value="transfer">Transfer</option>
                             </select>
-                            <button class="btn-clear" id="clearAllBtn" title="Hapus Semua">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
+                            <button class="btn-clear" id="clearAllBtn" title="Hapus Semua"><i class="fas fa-trash-alt"></i></button>
                         </div>
                     </div>
-                    <div class="transaction-list" id="transactionList">
-                        <div class="empty-state" id="emptyState">
-                            <i class="fas fa-receipt"></i>
-                            <p>Belum ada transaksi.</p>
-                            <span>Mulai catat keuanganmu sekarang!</span>
+
+                    <div class="card txn-card">
+                        <div class="transaction-list" id="transactionList">
+                            <div class="empty-state" id="emptyState">
+                                <i class="fas fa-receipt"></i>
+                                <p>Belum ada transaksi.</p>
+                                <span>Mulai catat keuanganmu sekarang!</span>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </section>
-    </main>
 
-    <!-- Toast Notification -->
+                <!-- ============ TAB: TARGET (goals) ============ -->
+                <div id="tab-goals" class="tab-section">
+                    <div class="section-head" style="margin-top: 0;">
+                        <h2><i class="fas fa-bullseye"></i> Target Tabungan</h2>
+                        <button class="btn-icon-text" id="addGoalBtn"><i class="fas fa-plus"></i> Tambah Target</button>
+                    </div>
+                    <div class="goals-container" id="goalsContainer">
+                        <div class="empty-state-small"><i class="fas fa-spinner fa-spin"></i></div>
+                    </div>
+                </div>
+
+                <!-- ============ TAB: HUTANG (debts) ============ -->
+                <div id="tab-debts" class="tab-section">
+                    <div class="section-head" style="margin-top: 0;">
+                        <h2><i class="fas fa-hand-holding-usd"></i> Catatan Hutang & Piutang</h2>
+                        <button class="btn-icon-text" id="addDebtBtn"><i class="fas fa-plus"></i> Tambah Catatan</button>
+                    </div>
+                    <div class="goals-container" id="debtsContainer">
+                        <div class="empty-state-small"><i class="fas fa-spinner fa-spin"></i></div>
+                    </div>
+                </div>
+
+                <!-- ============ TAB: CATAT (add transaction) ============ -->
+                <div id="tab-add" class="tab-section">
+                    <div class="panel form-panel">
+                        <h2 class="panel-title"><i class="fas fa-plus-circle"></i> Catat Transaksi</h2>
+                        <form id="transactionForm">
+                            <div class="scan-row">
+                                <button type="button" class="btn btn-ghost" id="scanReceiptBtn"><i class="fas fa-receipt"></i> Scan Struk dengan AI</button>
+                                <input type="file" id="receiptFile" accept="image/*" capture="environment" hidden>
+                            </div>
+                            <div class="form-group type-toggle">
+                                <label>Mode</label>
+                                <div class="toggle-buttons mini">
+                                    <button type="button" class="toggle-btn active" data-type="income" id="toggleIncome"><i class="fas fa-plus"></i> Masuk</button>
+                                    <button type="button" class="toggle-btn" data-type="expense" id="toggleExpense"><i class="fas fa-minus"></i> Keluar</button>
+                                    <button type="button" class="toggle-btn" data-type="transfer" id="toggleTransfer"><i class="fas fa-exchange-alt"></i> Transfer</button>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="description">Deskripsi</label>
+                                <input type="text" id="description" placeholder="Contoh: Gaji, Makan siang..." required>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="walletSelect">Ke Dompet</label>
+                                    <select id="walletSelect" required>
+                                        <option value="">Pilih...</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" id="toWalletGroup" style="display: none;">
+                                    <label for="toWalletSelect">Ke Dompet</label>
+                                    <select id="toWalletSelect">
+                                        <option value="">Pilih...</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" id="amountGroup">
+                                    <label for="amount">Jumlah (Rp)</label>
+                                    <input type="number" id="amount" placeholder="0" min="1" required>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group" id="categoryGroup">
+                                    <label for="category">Kategori <button type="button" class="ai-chip" id="aiSuggestCat" title="Sarankan kategori dengan AI">✦ Saran AI</button></label>
+                                    <select id="category">
+                                        <option value="">Pilih...</option>
+                                        <optgroup label="Pemasukan">
+                                            <option value="Gaji">💰 Gaji</option>
+                                            <option value="Freelance">💻 Freelance</option>
+                                            <option value="Investasi">📈 Investasi</option>
+                                            <option value="Lainnya (Masuk)">🎁 Lainnya</option>
+                                        </optgroup>
+                                        <optgroup label="Pengeluaran">
+                                            <option value="Makanan">🍔 Makanan</option>
+                                            <option value="Transportasi">🚗 Transportasi</option>
+                                            <option value="Belanja">🛒 Belanja</option>
+                                            <option value="Hiburan">🎬 Hiburan</option>
+                                            <option value="Tagihan">📄 Tagihan</option>
+                                            <option value="Kesehatan">💊 Kesehatan</option>
+                                            <option value="Pendidikan">📚 Pendidikan</option>
+                                            <option value="Lainnya (Keluar)">📦 Lainnya</option>
+                                        </optgroup>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="date">Tanggal</label>
+                                    <input type="date" id="date" required>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn-submit" id="submitBtn"><i class="fas fa-plus"></i> Tambah Transaksi</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- ============ BOTTOM NAV (mobile) ============ -->
+    <nav class="botnav">
+        <div class="nav-item active" data-tab="dashboard"><i class="fas fa-home"></i><span>Beranda</span></div>
+        <div class="nav-item" data-tab="wallets"><i class="fas fa-wallet"></i><span>Dompet</span></div>
+        <div class="nav-item" data-tab="assets"><i class="fas fa-layer-group"></i><span>Aset</span></div>
+        <div class="nav-item" data-tab="history"><i class="fas fa-list-ul"></i><span>Transaksi</span></div>
+        <div class="nav-item" data-tab="goals"><i class="fas fa-bullseye"></i><span>Target</span></div>
+        <div class="nav-item" data-tab="debts"><i class="fas fa-hand-holding-usd"></i><span>Hutang</span></div>
+    </nav>
+    </div>
+
+    <!-- ============ TOAST ============ -->
     <div class="toast-container" id="toastContainer"></div>
 
-    <!-- Delete Confirmation Modal -->
+    <!-- ============ MODALS ============ -->
+    <!-- Delete Confirmation -->
     <div class="modal-overlay" id="deleteModal">
         <div class="modal-box">
-            <div class="modal-icon"><i class="fas fa-exclamation-triangle"></i></div>
+            <div class="modal-icon warning"><i class="fas fa-exclamation-triangle"></i></div>
             <h3>Hapus Transaksi?</h3>
             <p>Tindakan ini tidak bisa dibatalkan.</p>
             <div class="modal-actions">
@@ -182,7 +373,7 @@
         </div>
     </div>
 
-    <!-- Clear All Confirmation Modal -->
+    <!-- Clear All Confirmation -->
     <div class="modal-overlay" id="clearModal">
         <div class="modal-box">
             <div class="modal-icon warning"><i class="fas fa-trash-alt"></i></div>
@@ -195,23 +386,326 @@
         </div>
     </div>
 
+    <!-- Add Wallet -->
+    <div class="modal-overlay" id="walletModal">
+        <div class="modal-box">
+            <div class="modal-icon"><i class="fas fa-wallet"></i></div>
+            <h3>Tambah Dompet Baru</h3>
+            <div class="form-group" style="margin-top: 18px;">
+                <label>Nama Dompet</label>
+                <input type="text" id="newWalletName" placeholder="Contoh: BCA, Seabank...">
+            </div>
+            <div class="form-group">
+                <label>Saldo Awal (Rp)</label>
+                <input type="number" id="newWalletBalance" placeholder="0">
+            </div>
+            <div class="modal-actions">
+                <button class="btn-modal btn-cancel" id="cancelWalletBtn">Batal</button>
+                <button class="btn-modal btn-confirm" id="confirmWalletBtn">Simpan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Asset -->
+    <div class="modal-overlay" id="assetModal">
+        <div class="modal-box">
+            <div class="modal-icon"><i class="fas fa-gem"></i></div>
+            <h3 id="assetModalTitle">Tambah Aset Baru</h3>
+            <div class="form-group" style="margin-top: 18px;">
+                <label>Nama Aset</label>
+                <input type="text" id="newAssetName" placeholder="Contoh: Emas 5g, Rumah...">
+            </div>
+            <div class="form-group">
+                <label>Nilai Saat Ini (Rp)</label>
+                <input type="number" id="newAssetValue" placeholder="0" min="0">
+            </div>
+            <div class="modal-actions">
+                <button class="btn-modal btn-cancel" id="cancelAssetBtn">Batal</button>
+                <button class="btn-modal btn-confirm" id="confirmAssetBtn">Simpan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Goal -->
+    <div class="modal-overlay" id="goalModal">
+        <div class="modal-box">
+            <div class="modal-icon"><i class="fas fa-bullseye"></i></div>
+            <h3>Tambah Target Tabungan</h3>
+            <div class="form-group" style="margin-top: 18px;">
+                <label>Nama Target</label>
+                <input type="text" id="newGoalName" placeholder="Contoh: Haji, Beli Motor...">
+            </div>
+            <div class="form-group">
+                <label>Nominal Target (Rp)</label>
+                <input type="number" id="newGoalTarget" placeholder="0" min="1">
+            </div>
+            <div class="form-group">
+                <label>Telah Terkumpul — Opsional (Rp)</label>
+                <input type="number" id="newGoalInitial" placeholder="0">
+            </div>
+            <div class="modal-actions">
+                <button class="btn-modal btn-cancel" id="cancelGoalBtn">Batal</button>
+                <button class="btn-modal btn-confirm" id="confirmGoalBtn">Simpan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Up Goal -->
+    <div class="modal-overlay" id="topupModal">
+        <div class="modal-box">
+            <div class="modal-icon"><i class="fas fa-piggy-bank"></i></div>
+            <h3>Isi Tabungan</h3>
+            <p id="topupGoalNameDisplay" style="font-weight: 700; color: var(--ink-0); margin-bottom: 14px;"></p>
+            <div class="form-group">
+                <label>Ambil dari Dompet</label>
+                <select id="topupWalletSelect"><option value="">Pilih Dompet...</option></select>
+            </div>
+            <div class="form-group">
+                <label>Top-Up Nominal (Rp)</label>
+                <input type="number" id="topupAmount" placeholder="0" min="1">
+            </div>
+            <div class="modal-actions">
+                <button class="btn-modal btn-cancel" id="cancelTopupBtn">Batal</button>
+                <button class="btn-modal btn-confirm" id="confirmTopupBtn">Top-Up Sekarang</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Execute Goal -->
+    <div class="modal-overlay" id="executeModal">
+        <div class="modal-box">
+            <div class="modal-icon"><i class="fas fa-check-circle"></i></div>
+            <h3>Selesaikan Target</h3>
+            <p id="executeGoalNameDisplay" style="font-weight: 700; color: var(--ink-0); margin-bottom: 14px;"></p>
+            <div class="form-group">
+                <label>Uang Terkumpul (Rp)</label>
+                <input type="number" id="executeTotalAmount" disabled>
+            </div>
+            <div class="form-group">
+                <label>Biaya Aktual yang Dibayarkan (Rp)</label>
+                <input type="number" id="executeActualCost" placeholder="0" min="0">
+            </div>
+            <div class="form-group" id="executeWalletGroup">
+                <label>Kembalikan Sisa (jika ada) ke Dompet</label>
+                <select id="executeWalletSelect"><option value="">Pilih Dompet...</option></select>
+                <small id="executeRefundInfo" style="color: var(--ink-2); font-size: 0.78rem;"></small>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-modal btn-cancel" id="cancelExecuteBtn">Batal</button>
+                <button class="btn-modal btn-confirm" id="confirmExecuteBtn">Selesaikan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Transaction -->
+    <div class="modal-overlay" id="editModal">
+        <div class="modal-box">
+            <div class="modal-icon warning"><i class="fas fa-pen"></i></div>
+            <h3>Edit Transaksi</h3>
+            <div class="form-group" style="margin-top: 18px;">
+                <label>Deskripsi</label>
+                <input type="text" id="editDescription" placeholder="Deskripsi transaksi">
+            </div>
+            <div class="form-group">
+                <label>Jumlah (Rp)</label>
+                <input type="number" id="editAmount" placeholder="0" min="1">
+            </div>
+            <div class="form-group">
+                <label>Kategori</label>
+                <select id="editCategory">
+                    <option value="">Pilih...</option>
+                    <optgroup label="Pemasukan">
+                        <option value="Gaji">💰 Gaji</option>
+                        <option value="Freelance">💻 Freelance</option>
+                        <option value="Investasi">📈 Investasi</option>
+                        <option value="Lainnya (Masuk)">🎁 Lainnya</option>
+                    </optgroup>
+                    <optgroup label="Pengeluaran">
+                        <option value="Makanan">🍔 Makanan</option>
+                        <option value="Transportasi">🚗 Transportasi</option>
+                        <option value="Belanja">🛒 Belanja</option>
+                        <option value="Hiburan">🎬 Hiburan</option>
+                        <option value="Tagihan">📄 Tagihan</option>
+                        <option value="Kesehatan">💊 Kesehatan</option>
+                        <option value="Pendidikan">📚 Pendidikan</option>
+                        <option value="Lainnya (Keluar)">📦 Lainnya</option>
+                    </optgroup>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Tanggal</label>
+                <input type="date" id="editDate">
+            </div>
+            <div class="modal-actions">
+                <button class="btn-modal btn-cancel" id="cancelEditBtn">Batal</button>
+                <button class="btn-modal btn-confirm" id="confirmEditBtn">Simpan Perubahan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transaction Detail -->
+    <div class="modal-overlay" id="detailModal">
+        <div class="modal-box">
+            <div class="modal-icon" id="detailIcon"><i class="fas fa-info-circle"></i></div>
+            <h3 id="detailDescription">Detail Transaksi</h3>
+            <div class="detail-content" id="detailContent"></div>
+            <div class="modal-actions" style="margin-top: 22px;">
+                <button class="btn-modal btn-cancel" id="closeDetailBtn" style="width: 100%;">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Generic Confirm -->
+    <div class="modal-overlay" id="genericConfirmModal">
+        <div class="modal-box">
+            <div class="modal-icon warning"><i class="fas fa-question-circle"></i></div>
+            <h3 id="genericConfirmTitle">Konfirmasi</h3>
+            <p id="genericConfirmMsg"></p>
+            <div class="modal-actions">
+                <button class="btn-modal btn-cancel" id="genericConfirmCancel">Batal</button>
+                <button class="btn-modal btn-confirm-delete" id="genericConfirmOk">Ya, Lanjutkan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Debt -->
+    <div class="modal-overlay" id="debtModal">
+        <div class="modal-box">
+            <div class="modal-icon expense"><i class="fas fa-hand-holding-usd"></i></div>
+            <h3>Catat Hutang Baru</h3>
+            <div class="form-group" style="margin-top: 18px;">
+                <label>Tipe Catatan</label>
+                <div class="toggle-buttons mini">
+                    <button type="button" class="toggle-btn active" id="debtToggleGive" data-type="give"><i class="fas fa-hand-holding-usd"></i> Piutang</button>
+                    <button type="button" class="toggle-btn" id="debtToggleTake" data-type="take"><i class="fas fa-handshake"></i> Hutang</button>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Nama / Keterangan</label>
+                <input type="text" id="newDebtName" placeholder="Contoh: Pinjaman Andi, Hutang Bank...">
+            </div>
+            <div class="form-group">
+                <label>Nomor WA (Opsional)</label>
+                <input type="tel" id="newDebtPhone" placeholder="Contoh: 08123456789">
+            </div>
+            <div class="form-group">
+                <label>Total Hutang (Rp)</label>
+                <input type="number" id="newDebtTotal" placeholder="0" min="1">
+            </div>
+            <div class="form-group">
+                <label id="newDebtWalletLabel">Potong dari Dompet (Opsional)</label>
+                <select id="newDebtWalletSelect"><option value="">Pilih Dompet...</option></select>
+                <small id="newDebtWalletHint" style="color: var(--ink-3); font-size: 0.72rem;">Jika dipilih, saldo akan langsung berkurang saat simpan.</small>
+            </div>
+            <div class="form-group">
+                <label>Telah Dibayar (Rp)</label>
+                <input type="number" id="newDebtPaid" placeholder="0">
+            </div>
+            <div class="modal-actions">
+                <button class="btn-modal btn-cancel" id="cancelDebtBtn">Batal</button>
+                <button class="btn-modal btn-confirm" id="confirmDebtBtn">Simpan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pay Debt -->
+    <div class="modal-overlay" id="payDebtModal">
+        <div class="modal-box">
+            <div class="modal-icon"><i class="fas fa-money-bill-wave"></i></div>
+            <h3>Bayar / Tagih</h3>
+            <p id="payDebtNameDisplay" style="font-weight: 700; color: var(--ink-0); margin-bottom: 6px;"></p>
+            <p id="payDebtTypeDisplay" style="font-size: 0.78rem; color: var(--ink-2); margin-bottom: 14px;"></p>
+            <div class="form-group">
+                <label id="payDebtWalletLabel">Sumber / Tujuan Dompet</label>
+                <select id="payDebtWalletSelect"><option value="">Pilih Dompet...</option></select>
+            </div>
+            <div class="form-group">
+                <label>Nominal Pembayaran (Rp)</label>
+                <input type="number" id="payDebtAmount" placeholder="0" min="1">
+            </div>
+            <div class="modal-actions">
+                <button class="btn-modal btn-cancel" id="cancelPayDebtBtn">Batal</button>
+                <button class="btn-modal btn-confirm" id="confirmPayDebtBtn">Proses Sekarang</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Adjust Wallet Balance -->
+    <div class="modal-overlay" id="adjustWalletModal">
+        <div class="modal-box">
+            <div class="modal-icon"><i class="fas fa-edit"></i></div>
+            <h3>Sesuaikan Saldo</h3>
+            <p id="adjustWalletNameDisplay" style="font-weight: 700; color: var(--ink-0); margin-bottom: 14px;"></p>
+            <div class="form-group">
+                <label>Saldo Baru (Rp)</label>
+                <input type="number" id="adjustWalletBalanceInput" placeholder="0">
+            </div>
+            <div class="modal-actions">
+                <button class="btn-modal btn-cancel" id="cancelAdjustWalletBtn">Batal</button>
+                <button class="btn-modal btn-confirm" id="confirmAdjustWalletBtn">Simpan Perubahan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI WhatsApp Reminder Draft -->
+    <div class="modal-overlay" id="waDraftModal">
+        <div class="modal-box">
+            <div class="modal-icon"><i class="fab fa-whatsapp" style="color:#25D366;"></i></div>
+            <h3>Pesan Pengingat</h3>
+            <p id="waDraftName" style="font-weight:700; color:var(--ink-0); margin-bottom:14px;"></p>
+            <div class="form-group">
+                <label>Isi Pesan</label>
+                <textarea id="waDraftText" class="text-field" rows="5" style="resize:vertical; min-height:120px; line-height:1.5;"></textarea>
+            </div>
+            <button type="button" class="btn btn-ghost btn-sm" id="waDraftAiBtn" style="width:100%; margin-top:4px;"><i class="fas fa-wand-magic-sparkles"></i> Tulis ulang dengan AI</button>
+            <div class="modal-actions">
+                <button class="btn-modal btn-cancel" id="waDraftCancel">Batal</button>
+                <button class="btn-modal btn-confirm" id="waDraftSend"><i class="fab fa-whatsapp"></i> Buka WhatsApp</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Auth -->
+    <div class="modal-overlay active" id="authModal">
+        <div class="modal-box">
+            <div class="logo">
+                <div class="logo-icon"><i class="fas fa-coins"></i></div>
+                <span>Buku<span class="text-accent">Money</span></span>
+            </div>
+            <h3 id="authTitle">Masuk</h3>
+            <p id="authSubtitle">Silakan masuk untuk mencatat keuangan Anda.</p>
+            <form id="authForm" onsubmit="return false;">
+                <div class="form-group" style="margin-top: 18px;">
+                    <label>Email</label>
+                    <input type="email" id="authEmail" placeholder="email@contoh.com" required>
+                </div>
+                <div class="form-group">
+                    <label>Kata Sandi</label>
+                    <input type="password" id="authPassword" placeholder="Min. 6 karakter" required>
+                </div>
+                <div id="authError"></div>
+                <button type="submit" class="btn-submit" id="authActionBtn">Masuk</button>
+            </form>
+            <div style="margin-top: 16px; font-size: 0.85rem; text-align: center;">
+                <span id="authToggleText" style="color: var(--ink-2);">Belum punya akun?</span>
+                <span id="authToggleBtn">Daftar di sini</span>
+            </div>
+        </div>
+    </div>
+
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script type="module" src="/src/app.js"></script>
     <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyAXEDh3wb2qZ9qO5VrbV4VhStlqMUf7vmg",
-            authDomain: "newproject-fbb7e.firebaseapp.com",
-            databaseURL: "https://newproject-fbb7e-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "newproject-fbb7e",
-            storageBucket: "newproject-fbb7e.firebasestorage.app",
-            messagingSenderId: "726576406795",
-            appId: "1:726576406795:web:a083e42e09e91a4505020e"
-        };
-        firebase.initializeApp(firebaseConfig);
-        window.db = firebase.firestore();
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(() => console.log('ServiceWorker registered'))
+                    .catch(err => console.log('ServiceWorker registration failed:', err));
+            });
+        }
     </script>
-    <!-- Custom JS -->
-    <script src="js/app.js"></script>
 </body>
 </html>

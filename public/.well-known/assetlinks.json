@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.bukumoney.twa",
+      "sha256_cert_fingerprints": [
+        "FD:52:A3:22:CB:A5:68:8E:01:DE:54:5C:44:F7:3F:CC:EE:BC:4D:2A:ED:22:B3:97:8F:ED:51:A9:5E:35:E9:67"
+      ]
+    }
+  }
+]

@@ -1,0 +1,53 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ==========================================
+    // RULES UNTUK APLIKASI LAIN (BUKUMONEY)
+    // ==========================================
+    // Allow reading old global collections for migration purposes
+    match /bk_transactions/{id} {
+      allow read: if request.auth != null;
+      allow update: if request.auth != null && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['migrated']) && request.resource.data.migrated == true;
+    }
+    match /bk_wallets/{id} {
+      allow read: if request.auth != null;
+      allow update: if request.auth != null && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['migrated']) && request.resource.data.migrated == true;
+    }
+    match /bk_goals/{id} {
+      allow read: if request.auth != null;
+      allow update: if request.auth != null && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['migrated']) && request.resource.data.migrated == true;
+    }
+    
+    // Data private app lain (melindungi seluruh document/sub-collection di dalam folder /users/userId/...)
+    match /users/{userId}/{document=**} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // ==========================================
+    // RULES UNTUK KIOS FINANCE
+    // ==========================================
+    // Mengizinkan user yang telah login di Kios Finance membaca & menulis collections Kios
+    match /products/{id} {
+      allow read, write: if request.auth != null;
+    }
+    match /transactions/{id} {
+      allow read, write: if request.auth != null;
+    }
+    match /shift_closings/{id} {
+      allow read, write: if request.auth != null;
+    }
+     match /balances/{id} {
+      allow read, write: if request.auth != null;
+    }
+    
+    // Mengizinkan user membaca data Profil Pengguna Dasar (/users/id_karyawan).
+    // Ini DIBUTUHKAN agar Kios Finance dapat mendeteksi daftar user dan Role mereka 
+    // seperti 'owner' maupun 'employee'.
+    // Jangan khawatir: Data private aplikasi BukuMoney tetap aman dikarenakan block
+    // "/users/{userId}/{document=**}" di bagian atas membatasi akses sub-collection nya secara spesifik.
+    match /users/{userId} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}
