@@ -2167,28 +2167,37 @@ document.addEventListener('DOMContentLoaded', () => {
 
             ctx.clearRect(0, 0, width, height);
 
-            // 1. Get the last 6 months labels & keys
-            const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agt', 'Sep', 'Okt', 'Nov', 'Des'];
-            const months = [];
-            const now = new Date();
-            for (let i = 5; i >= 0; i--) {
-                const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-                months.push({
-                    year: d.getFullYear(),
-                    month: d.getMonth(),
-                    label: monthNames[d.getMonth()],
-                    key: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+            // 1. Determine anchor date (latest transaction date, fallback to today)
+            const validDates = transactions
+                .map(t => t.date)
+                .filter(d => d && typeof d === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(d))
+                .sort();
+            
+            let anchorDate = new Date();
+            if (validDates.length > 0) {
+                anchorDate = new Date(validDates[validDates.length - 1] + 'T00:00:00');
+            }
+
+            // 2. Generate last 7 calendar days
+            const days = [];
+            for (let i = 6; i >= 0; i--) {
+                const d = new Date(anchorDate.getFullYear(), anchorDate.getMonth(), anchorDate.getDate() - i);
+                const yyyy = d.getFullYear();
+                const mm = String(d.getMonth() + 1).padStart(2, '0');
+                const dd = String(d.getDate()).padStart(2, '0');
+                days.push({
+                    label: `${d.getDate()}/${d.getMonth() + 1}`,
+                    key: `${yyyy}-${mm}-${dd}`
                 });
             }
 
-            // 2. Sum income and expenses per month
-            const incomeData = Array(6).fill(0);
-            const expenseData = Array(6).fill(0);
+            // 3. Sum income and expenses per day
+            const incomeData = Array(7).fill(0);
+            const expenseData = Array(7).fill(0);
 
             transactions.forEach(t => {
                 if (!t.date || typeof t.date !== 'string') return;
-                const tKey = t.date.substring(0, 7); // "YYYY-MM"
-                const idx = months.findIndex(m => m.key === tKey);
+                const idx = days.findIndex(d => d.key === t.date);
                 if (idx !== -1) {
                     const amt = Number(t.amount) || 0;
                     if (t.type === 'income') {
@@ -2199,10 +2208,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
 
-            // 3. Find max value for Y scaling
+            // 4. Find max value for Y scaling
             const maxVal = Math.max(...incomeData, ...expenseData, 100000); // at least 100k scale
 
-            // 4. Drawing geometry
+            // 5. Drawing geometry
             const paddingLeft = 45;
             const paddingRight = 15;
             const paddingTop = 15;
@@ -2244,16 +2253,16 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.textAlign = 'center';
             ctx.textBaseline = 'top';
             const points = [];
-            months.forEach((m, idx) => {
-                const x = paddingLeft + (idx / 5) * chartWidth;
-                ctx.fillText(m.label, x, height - paddingBottom + 8);
+            days.forEach((day, idx) => {
+                const x = paddingLeft + (idx / 6) * chartWidth;
+                ctx.fillText(day.label, x, height - paddingBottom + 8);
                 points.push(x);
             });
 
             // Helper to draw line and area
             function drawTrendLine(data, strokeColor, fillColor) {
                 ctx.beginPath();
-                months.forEach((m, idx) => {
+                days.forEach((day, idx) => {
                     const x = points[idx];
                     const y = paddingTop + chartHeight - (data[idx] / maxVal) * chartHeight;
                     if (idx === 0) ctx.moveTo(x, y);
@@ -2264,7 +2273,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.stroke();
 
                 // Area under the line
-                ctx.lineTo(points[5], paddingTop + chartHeight);
+                ctx.lineTo(points[6], paddingTop + chartHeight);
                 ctx.lineTo(points[0], paddingTop + chartHeight);
                 ctx.closePath();
                 const grad = ctx.createLinearGradient(0, paddingTop, 0, paddingTop + chartHeight);
@@ -2274,7 +2283,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.fill();
 
                 // Draw dots at points
-                months.forEach((m, idx) => {
+                days.forEach((day, idx) => {
                     const x = points[idx];
                     const y = paddingTop + chartHeight - (data[idx] / maxVal) * chartHeight;
                     ctx.beginPath();
