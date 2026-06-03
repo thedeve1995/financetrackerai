@@ -139,11 +139,21 @@
                         </div>
                         <div class="card card-pad">
                             <div class="card-head">
-                                <h2 class="card-title">Transaksi Terakhir</h2>
-                                <span class="link" data-tab="history">Lihat semua <i class="fas fa-chevron-right"></i></span>
+                                <h2 class="card-title">Tren Keuangan</h2>
+                                <span class="muted-sm">Pemasukan vs Pengeluaran</span>
                             </div>
-                            <div class="recent-list" id="dashRecentList">
-                                <div class="empty-state-small"><i class="fas fa-spinner fa-spin"></i></div>
+                            <div class="trend-wrap">
+                                <canvas id="trendChart"></canvas>
+                            </div>
+                            <div class="trend-legend">
+                                <div class="trend-legend-item">
+                                    <span class="trend-legend-color" style="background: var(--pos);"></span>
+                                    <span style="color: var(--ink-1);">Pemasukan</span>
+                                </div>
+                                <div class="trend-legend-item">
+                                    <span class="trend-legend-color" style="background: var(--neg);"></span>
+                                    <span style="color: var(--ink-1);">Pengeluaran</span>
+                                </div>
                             </div>
                         </div>
                     </div>

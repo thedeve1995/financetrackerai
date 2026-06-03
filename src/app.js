@@ -431,7 +431,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (main) main.scrollTo({ top: 0 });
         window.scrollTo({ top: 0 });
 
-        if (targetTab === 'dashboard') renderChart();
+        if (targetTab === 'dashboard') {
+            renderChart();
+            renderTrendChart();
+        }
     }
 
     // Any element carrying [data-tab] navigates: sidebar items, bottom-nav
@@ -1636,7 +1639,10 @@ document.addEventListener('DOMContentLoaded', () => {
     let _chartResizeTimer;
     window.addEventListener('resize', () => {
         clearTimeout(_chartResizeTimer);
-        _chartResizeTimer = setTimeout(renderChart, 200);
+        _chartResizeTimer = setTimeout(() => {
+            renderChart();
+            renderTrendChart();
+        }, 200);
     });
 
     // ============================
@@ -1792,6 +1798,7 @@ document.addEventListener('DOMContentLoaded', () => {
         renderTransactions();
         renderRecent();
         renderChart();
+        renderTrendChart();
         renderDebts();
     }
 
@@ -2043,7 +2050,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const centerX = size / 2;
         const centerY = size / 2;
         const outerRadius = size / 2 - 10;
-        const innerRadius = outerRadius * 0.65;
+        const innerRadius = outerRadius * 0.75;
 
         ctx.clearRect(0, 0, size, size);
 
@@ -2058,7 +2065,17 @@ document.addEventListener('DOMContentLoaded', () => {
         const values = Object.values(expenseData);
         const total = values.reduce((a, b) => a + b, 0);
 
-        if (totalEl) totalEl.textContent = formatCurrency(total);
+        if (totalEl) {
+            totalEl.textContent = formatCurrency(total);
+            const len = totalEl.textContent.length;
+            if (len > 12) {
+                totalEl.style.fontSize = '12px';
+            } else if (len > 9) {
+                totalEl.style.fontSize = '13.5px';
+            } else {
+                totalEl.style.fontSize = '16.5px';
+            }
+        }
         if (legendEl) legendEl.innerHTML = '';
 
         if (categories.length === 0) {
@@ -2099,6 +2116,151 @@ document.addEventListener('DOMContentLoaded', () => {
                 legendEl.appendChild(legendItem);
             }
         });
+    }
+
+    function renderTrendChart() {
+        const canvas = document.getElementById('trendChart');
+        if (!canvas || canvas.offsetParent === null) return;
+
+        const ctx = canvas.getContext('2d');
+        const width = canvas.parentElement.clientWidth;
+        const height = canvas.parentElement.clientHeight || 180;
+        if (width === 0) return;
+
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = width * dpr;
+        canvas.height = height * dpr;
+        ctx.style.width = width + 'px';
+        ctx.style.height = height + 'px';
+        ctx.scale(dpr, dpr);
+
+        ctx.clearRect(0, 0, width, height);
+
+        // 1. Get the last 6 months labels & keys
+        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agt', 'Sep', 'Okt', 'Nov', 'Des'];
+        const months = [];
+        const now = new Date();
+        for (let i = 5; i >= 0; i--) {
+            const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+            months.push({
+                year: d.getFullYear(),
+                month: d.getMonth(),
+                label: monthNames[d.getMonth()],
+                key: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+            });
+        }
+
+        // 2. Sum income and expenses per month
+        const incomeData = Array(6).fill(0);
+        const expenseData = Array(6).fill(0);
+
+        transactions.forEach(t => {
+            if (!t.date) return;
+            const tKey = t.date.substring(0, 7); // "YYYY-MM"
+            const idx = months.findIndex(m => m.key === tKey);
+            if (idx !== -1) {
+                if (t.type === 'income') {
+                    incomeData[idx] += t.amount;
+                } else if (t.type === 'expense') {
+                    expenseData[idx] += t.amount;
+                }
+            }
+        });
+
+        // 3. Find max value for Y scaling
+        const maxVal = Math.max(...incomeData, ...expenseData, 100000); // at least 100k scale
+
+        // 4. Drawing geometry
+        const paddingLeft = 45;
+        const paddingRight = 15;
+        const paddingTop = 15;
+        const paddingBottom = 25;
+
+        const chartWidth = width - paddingLeft - paddingRight;
+        const chartHeight = height - paddingTop - paddingBottom;
+
+        // Draw grid lines & Y labels (3 ticks)
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+        ctx.lineWidth = 1;
+        ctx.fillStyle = 'var(--ink-3)';
+        ctx.font = '10px var(--font-num)';
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'middle';
+
+        for (let i = 0; i <= 2; i++) {
+            const val = (maxVal / 2) * i;
+            const y = paddingTop + chartHeight - (val / maxVal) * chartHeight;
+            // Draw grid line
+            ctx.beginPath();
+            ctx.moveTo(paddingLeft, y);
+            ctx.lineTo(width - paddingRight, y);
+            ctx.stroke();
+
+            // Draw Y label
+            let labelText = '';
+            if (val >= 1000000) {
+                labelText = (val / 1000000).toFixed(1) + 'M';
+            } else if (val >= 1000) {
+                labelText = (val / 1000).toFixed(0) + 'K';
+            } else {
+                labelText = val.toString();
+            }
+            ctx.fillText(labelText, paddingLeft - 8, y);
+        }
+
+        // Draw X labels
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'top';
+        const points = [];
+        months.forEach((m, idx) => {
+            const x = paddingLeft + (idx / 5) * chartWidth;
+            ctx.fillText(m.label, x, height - paddingBottom + 8);
+            points.push(x);
+        });
+
+        // Helper to draw line and area
+        function drawTrendLine(data, strokeColor, fillColor) {
+            ctx.beginPath();
+            months.forEach((m, idx) => {
+                const x = points[idx];
+                const y = paddingTop + chartHeight - (data[idx] / maxVal) * chartHeight;
+                if (idx === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            });
+            ctx.strokeStyle = strokeColor;
+            ctx.lineWidth = 2.5;
+            ctx.stroke();
+
+            // Area under the line
+            ctx.lineTo(points[5], paddingTop + chartHeight);
+            ctx.lineTo(points[0], paddingTop + chartHeight);
+            ctx.closePath();
+            const grad = ctx.createLinearGradient(0, paddingTop, 0, paddingTop + chartHeight);
+            grad.addColorStop(0, fillColor);
+            grad.addColorStop(1, 'transparent');
+            ctx.fillStyle = grad;
+            ctx.fill();
+
+            // Draw dots at points
+            months.forEach((m, idx) => {
+                const x = points[idx];
+                const y = paddingTop + chartHeight - (data[idx] / maxVal) * chartHeight;
+                ctx.beginPath();
+                ctx.arc(x, y, 4, 0, Math.PI * 2);
+                ctx.fillStyle = strokeColor;
+                ctx.fill();
+                ctx.beginPath();
+                ctx.arc(x, y, 2, 0, Math.PI * 2);
+                ctx.fillStyle = 'var(--bg-0)';
+                ctx.fill();
+            });
+        }
+
+        // Draw income line (green/pos)
+        drawTrendLine(incomeData, 'var(--pos)', 'rgba(34, 197, 94, 0.1)');
+
+        // Draw expense line (red/neg)
+        drawTrendLine(expenseData, 'var(--neg)', 'rgba(239, 68, 68, 0.1)');
     }
 
     // ============================
