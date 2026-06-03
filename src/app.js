@@ -2119,163 +2119,183 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderTrendChart() {
-        const canvas = document.getElementById('trendChart');
-        if (!canvas) return;
+        try {
+            const canvas = document.getElementById('trendChart');
+            if (!canvas) return;
 
-        const ctx = canvas.getContext('2d');
-        const width = canvas.parentElement.clientWidth;
-        const height = canvas.parentElement.clientHeight || 180;
-        if (width === 0) return;
+            const ctx = canvas.getContext('2d');
+            const width = canvas.parentElement.clientWidth;
+            const height = canvas.parentElement.clientHeight || 180;
 
-        // Helper to resolve CSS variables on canvas dynamically
-        function resolveCssColor(varName, fallback) {
-            const dummy = document.createElement('div');
-            dummy.style.color = `var(${varName})`;
-            document.body.appendChild(dummy);
-            const computed = window.getComputedStyle(dummy).color;
-            document.body.removeChild(dummy);
-            return computed || fallback;
-        }
+            const tabEl = document.getElementById('tab-dashboard');
+            const isActive = tabEl && tabEl.classList.contains('active');
 
-        const posColor = resolveCssColor('--pos', '#34d399');
-        const negColor = resolveCssColor('--neg', '#fb7185');
-        const ink3Color = resolveCssColor('--ink-3', 'rgba(148, 163, 184, 0.4)');
-        const bg0Color = resolveCssColor('--bg-0', '#0b0f19');
-
-        const dpr = window.devicePixelRatio || 1;
-        canvas.width = width * dpr;
-        canvas.height = height * dpr;
-        ctx.style.width = width + 'px';
-        ctx.style.height = height + 'px';
-        ctx.scale(dpr, dpr);
-
-        ctx.clearRect(0, 0, width, height);
-
-        // 1. Get the last 6 months labels & keys
-        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agt', 'Sep', 'Okt', 'Nov', 'Des'];
-        const months = [];
-        const now = new Date();
-        for (let i = 5; i >= 0; i--) {
-            const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-            months.push({
-                year: d.getFullYear(),
-                month: d.getMonth(),
-                label: monthNames[d.getMonth()],
-                key: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
-            });
-        }
-
-        // 2. Sum income and expenses per month
-        const incomeData = Array(6).fill(0);
-        const expenseData = Array(6).fill(0);
-
-        transactions.forEach(t => {
-            if (!t.date) return;
-            const tKey = t.date.substring(0, 7); // "YYYY-MM"
-            const idx = months.findIndex(m => m.key === tKey);
-            if (idx !== -1) {
-                if (t.type === 'income') {
-                    incomeData[idx] += t.amount;
-                } else if (t.type === 'expense') {
-                    expenseData[idx] += t.amount;
+            if (width === 0) {
+                if (isActive) {
+                    const retries = parseInt(canvas.dataset.retryCount) || 0;
+                    if (retries < 15) {
+                        canvas.dataset.retryCount = retries + 1;
+                        setTimeout(renderTrendChart, 80);
+                    }
                 }
+                return;
             }
-        });
+            canvas.dataset.retryCount = '0'; // Reset retry count
 
-        // 3. Find max value for Y scaling
-        const maxVal = Math.max(...incomeData, ...expenseData, 100000); // at least 100k scale
-
-        // 4. Drawing geometry
-        const paddingLeft = 45;
-        const paddingRight = 15;
-        const paddingTop = 15;
-        const paddingBottom = 25;
-
-        const chartWidth = width - paddingLeft - paddingRight;
-        const chartHeight = height - paddingTop - paddingBottom;
-
-        // Draw grid lines & Y labels (3 ticks)
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
-        ctx.lineWidth = 1;
-        ctx.fillStyle = ink3Color;
-        ctx.font = "10px 'Space Grotesk', system-ui, sans-serif";
-        ctx.textAlign = 'right';
-        ctx.textBaseline = 'middle';
-
-        for (let i = 0; i <= 2; i++) {
-            const val = (maxVal / 2) * i;
-            const y = paddingTop + chartHeight - (val / maxVal) * chartHeight;
-            // Draw grid line
-            ctx.beginPath();
-            ctx.moveTo(paddingLeft, y);
-            ctx.lineTo(width - paddingRight, y);
-            ctx.stroke();
-
-            // Draw Y label
-            let labelText = '';
-            if (val >= 1000000) {
-                labelText = (val / 1000000).toFixed(1) + 'M';
-            } else if (val >= 1000) {
-                labelText = (val / 1000).toFixed(0) + 'K';
-            } else {
-                labelText = val.toString();
+            // Helper to resolve CSS variables on canvas dynamically
+            function resolveCssColor(varName, fallback) {
+                if (!document.body) return fallback;
+                const dummy = document.createElement('div');
+                dummy.style.color = `var(${varName})`;
+                document.body.appendChild(dummy);
+                const computed = window.getComputedStyle(dummy).color;
+                document.body.removeChild(dummy);
+                return computed || fallback;
             }
-            ctx.fillText(labelText, paddingLeft - 8, y);
-        }
 
-        // Draw X labels
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'top';
-        const points = [];
-        months.forEach((m, idx) => {
-            const x = paddingLeft + (idx / 5) * chartWidth;
-            ctx.fillText(m.label, x, height - paddingBottom + 8);
-            points.push(x);
-        });
+            const posColor = resolveCssColor('--pos', '#34d399');
+            const negColor = resolveCssColor('--neg', '#fb7185');
+            const ink3Color = resolveCssColor('--ink-3', 'rgba(148, 163, 184, 0.4)');
+            const bg0Color = resolveCssColor('--bg-0', '#0b0f19');
 
-        // Helper to draw line and area
-        function drawTrendLine(data, strokeColor, fillColor) {
-            ctx.beginPath();
-            months.forEach((m, idx) => {
-                const x = points[idx];
-                const y = paddingTop + chartHeight - (data[idx] / maxVal) * chartHeight;
-                if (idx === 0) ctx.moveTo(x, y);
-                else ctx.lineTo(x, y);
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = width * dpr;
+            canvas.height = height * dpr;
+            ctx.style.width = width + 'px';
+            ctx.style.height = height + 'px';
+            ctx.scale(dpr, dpr);
+
+            ctx.clearRect(0, 0, width, height);
+
+            // 1. Get the last 6 months labels & keys
+            const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agt', 'Sep', 'Okt', 'Nov', 'Des'];
+            const months = [];
+            const now = new Date();
+            for (let i = 5; i >= 0; i--) {
+                const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+                months.push({
+                    year: d.getFullYear(),
+                    month: d.getMonth(),
+                    label: monthNames[d.getMonth()],
+                    key: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+                });
+            }
+
+            // 2. Sum income and expenses per month
+            const incomeData = Array(6).fill(0);
+            const expenseData = Array(6).fill(0);
+
+            transactions.forEach(t => {
+                if (!t.date || typeof t.date !== 'string') return;
+                const tKey = t.date.substring(0, 7); // "YYYY-MM"
+                const idx = months.findIndex(m => m.key === tKey);
+                if (idx !== -1) {
+                    const amt = Number(t.amount) || 0;
+                    if (t.type === 'income') {
+                        incomeData[idx] += amt;
+                    } else if (t.type === 'expense') {
+                        expenseData[idx] += amt;
+                    }
+                }
             });
-            ctx.strokeStyle = strokeColor;
-            ctx.lineWidth = 2.5;
-            ctx.stroke();
 
-            // Area under the line
-            ctx.lineTo(points[5], paddingTop + chartHeight);
-            ctx.lineTo(points[0], paddingTop + chartHeight);
-            ctx.closePath();
-            const grad = ctx.createLinearGradient(0, paddingTop, 0, paddingTop + chartHeight);
-            grad.addColorStop(0, fillColor);
-            grad.addColorStop(1, 'transparent');
-            ctx.fillStyle = grad;
-            ctx.fill();
+            // 3. Find max value for Y scaling
+            const maxVal = Math.max(...incomeData, ...expenseData, 100000); // at least 100k scale
 
-            // Draw dots at points
+            // 4. Drawing geometry
+            const paddingLeft = 45;
+            const paddingRight = 15;
+            const paddingTop = 15;
+            const paddingBottom = 25;
+
+            const chartWidth = width - paddingLeft - paddingRight;
+            const chartHeight = height - paddingTop - paddingBottom;
+
+            // Draw grid lines & Y labels (3 ticks)
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+            ctx.lineWidth = 1;
+            ctx.fillStyle = ink3Color;
+            ctx.font = "10px 'Space Grotesk', system-ui, sans-serif";
+            ctx.textAlign = 'right';
+            ctx.textBaseline = 'middle';
+
+            for (let i = 0; i <= 2; i++) {
+                const val = (maxVal / 2) * i;
+                const y = paddingTop + chartHeight - (val / maxVal) * chartHeight;
+                // Draw grid line
+                ctx.beginPath();
+                ctx.moveTo(paddingLeft, y);
+                ctx.lineTo(width - paddingRight, y);
+                ctx.stroke();
+
+                // Draw Y label
+                let labelText = '';
+                if (val >= 1000000) {
+                    labelText = (val / 1000000).toFixed(1) + 'M';
+                } else if (val >= 1000) {
+                    labelText = (val / 1000).toFixed(0) + 'K';
+                } else {
+                    labelText = val.toString();
+                }
+                ctx.fillText(labelText, paddingLeft - 8, y);
+            }
+
+            // Draw X labels
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'top';
+            const points = [];
             months.forEach((m, idx) => {
-                const x = points[idx];
-                const y = paddingTop + chartHeight - (data[idx] / maxVal) * chartHeight;
-                ctx.beginPath();
-                ctx.arc(x, y, 4, 0, Math.PI * 2);
-                ctx.fillStyle = strokeColor;
-                ctx.fill();
-                ctx.beginPath();
-                ctx.arc(x, y, 2, 0, Math.PI * 2);
-                ctx.fillStyle = bg0Color;
-                ctx.fill();
+                const x = paddingLeft + (idx / 5) * chartWidth;
+                ctx.fillText(m.label, x, height - paddingBottom + 8);
+                points.push(x);
             });
+
+            // Helper to draw line and area
+            function drawTrendLine(data, strokeColor, fillColor) {
+                ctx.beginPath();
+                months.forEach((m, idx) => {
+                    const x = points[idx];
+                    const y = paddingTop + chartHeight - (data[idx] / maxVal) * chartHeight;
+                    if (idx === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                });
+                ctx.strokeStyle = strokeColor;
+                ctx.lineWidth = 2.5;
+                ctx.stroke();
+
+                // Area under the line
+                ctx.lineTo(points[5], paddingTop + chartHeight);
+                ctx.lineTo(points[0], paddingTop + chartHeight);
+                ctx.closePath();
+                const grad = ctx.createLinearGradient(0, paddingTop, 0, paddingTop + chartHeight);
+                grad.addColorStop(0, fillColor);
+                grad.addColorStop(1, 'transparent');
+                ctx.fillStyle = grad;
+                ctx.fill();
+
+                // Draw dots at points
+                months.forEach((m, idx) => {
+                    const x = points[idx];
+                    const y = paddingTop + chartHeight - (data[idx] / maxVal) * chartHeight;
+                    ctx.beginPath();
+                    ctx.arc(x, y, 4, 0, Math.PI * 2);
+                    ctx.fillStyle = strokeColor;
+                    ctx.fill();
+                    ctx.beginPath();
+                    ctx.arc(x, y, 2, 0, Math.PI * 2);
+                    ctx.fillStyle = bg0Color;
+                    ctx.fill();
+                });
+            }
+
+            // Draw income line (green/pos)
+            drawTrendLine(incomeData, posColor, 'rgba(52, 211, 153, 0.12)');
+
+            // Draw expense line (red/neg)
+            drawTrendLine(expenseData, negColor, 'rgba(251, 113, 133, 0.12)');
+        } catch (err) {
+            console.error('Error drawing trend chart:', err);
         }
-
-        // Draw income line (green/pos)
-        drawTrendLine(incomeData, posColor, 'rgba(52, 211, 153, 0.12)');
-
-        // Draw expense line (red/neg)
-        drawTrendLine(expenseData, negColor, 'rgba(251, 113, 133, 0.12)');
     }
 
     // ============================
