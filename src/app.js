@@ -2120,12 +2120,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderTrendChart() {
         const canvas = document.getElementById('trendChart');
-        if (!canvas || canvas.offsetParent === null) return;
+        if (!canvas) return;
 
         const ctx = canvas.getContext('2d');
         const width = canvas.parentElement.clientWidth;
         const height = canvas.parentElement.clientHeight || 180;
         if (width === 0) return;
+
+        // Helper to resolve CSS variables on canvas dynamically
+        function resolveCssColor(varName, fallback) {
+            const dummy = document.createElement('div');
+            dummy.style.color = `var(${varName})`;
+            document.body.appendChild(dummy);
+            const computed = window.getComputedStyle(dummy).color;
+            document.body.removeChild(dummy);
+            return computed || fallback;
+        }
+
+        const posColor = resolveCssColor('--pos', '#34d399');
+        const negColor = resolveCssColor('--neg', '#fb7185');
+        const ink3Color = resolveCssColor('--ink-3', 'rgba(148, 163, 184, 0.4)');
+        const bg0Color = resolveCssColor('--bg-0', '#0b0f19');
 
         const dpr = window.devicePixelRatio || 1;
         canvas.width = width * dpr;
@@ -2182,8 +2197,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // Draw grid lines & Y labels (3 ticks)
         ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
         ctx.lineWidth = 1;
-        ctx.fillStyle = 'var(--ink-3)';
-        ctx.font = '10px var(--font-num)';
+        ctx.fillStyle = ink3Color;
+        ctx.font = "10px 'Space Grotesk', system-ui, sans-serif";
         ctx.textAlign = 'right';
         ctx.textBaseline = 'middle';
 
@@ -2251,16 +2266,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.fill();
                 ctx.beginPath();
                 ctx.arc(x, y, 2, 0, Math.PI * 2);
-                ctx.fillStyle = 'var(--bg-0)';
+                ctx.fillStyle = bg0Color;
                 ctx.fill();
             });
         }
 
         // Draw income line (green/pos)
-        drawTrendLine(incomeData, 'var(--pos)', 'rgba(34, 197, 94, 0.1)');
+        drawTrendLine(incomeData, posColor, 'rgba(52, 211, 153, 0.12)');
 
         // Draw expense line (red/neg)
-        drawTrendLine(expenseData, 'var(--neg)', 'rgba(239, 68, 68, 0.1)');
+        drawTrendLine(expenseData, negColor, 'rgba(251, 113, 133, 0.12)');
     }
 
     // ============================
