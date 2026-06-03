@@ -1,23 +1,65 @@
-# Dependencies
+# ========================
+# Node / Vite
+# ========================
 node_modules/
-
-# Build output
 dist/
+.vite/
+*.local
 
-# Environment variables & secrets (JANGAN di-commit)
+# ========================
+# Environment & Secrets
+# ========================
 .env
 .env.*
 !.env.example
 
-# Logs
-*.log
-npm-debug.log*
+# ========================
+# Sensitive Keys & Certs
+# ========================
+*.keystore
+*.jks
+key.txt
+key2.txt
+*.pem
+*.p12
 
-# Editor / OS
+# ========================
+# Android Build Output
+# ========================
+app/build/
+build/
+*.aab
+*.apk
+*.idsig
+manifest-checksum.txt
+build_log.txt
+
+# ========================
+# Gradle
+# ========================
+.gradle/
+gradle/wrapper/gradle-wrapper.jar
+gradlew
+gradlew.bat
+local.properties
+
+# ========================
+# Firebase
+# ========================
+.firebase/
+
+# ========================
+# Misc / Editor
+# ========================
 .DS_Store
 Thumbs.db
 .vscode/
 .idea/
+*.log
 
-# Misc
-*.local
+# ========================
+# Temp / Debug scripts
+# ========================
+extract.js
+fix.js
+fix.mjs

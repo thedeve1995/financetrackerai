@@ -424,9 +424,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const head = PAGE_HEAD[targetTab];
         if (head) {
             const titleEl = document.getElementById('pageTitle');
-            const subEl = document.getElementById('pageSub');
             if (titleEl) titleEl.textContent = head[0];
-            if (subEl) subEl.textContent = head[1];
         }
 
         const main = document.querySelector('.main');

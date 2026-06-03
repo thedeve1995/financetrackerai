@@ -53,13 +53,11 @@
                 <div class="topbar">
                     <div>
                         <h1 id="pageTitle">Halo 👋</h1>
-                        <div class="sub" id="pageSub">Ringkasan keuangan keluargamu hari ini</div>
                     </div>
                     <div class="topbar-actions">
                         <div class="date-chip"><i class="fas fa-calendar-day"></i><span id="currentDate"></span></div>
-                        <button class="icon-btn only-mobile" id="logoutBtnTop" title="Keluar"><i class="fas fa-sign-out-alt"></i></button>
-                        <button class="icon-btn" id="notifBtn" title="Notifikasi"><i class="fas fa-bell"></i></button>
                         <button class="btn btn-primary" data-tab="add"><i class="fas fa-plus"></i> Catat</button>
+                        <button class="icon-btn" id="logoutBtnTop" title="Keluar"><i class="fas fa-sign-out-alt"></i></button>
                     </div>
                 </div>
 
@@ -77,12 +75,13 @@
                                     <span class="hero-num num" id="totalWealth">Rp 0</span>
                                     <span class="chip pos"><i class="fas fa-arrow-up"></i> Kekayaan bersih</span>
                                 </div>
-                                <div class="hero-sub">Saldo dompet + aset + piutang − hutang · diperbarui hari ini</div>
-                                <div class="qa-row">
-                                    <button class="qa" data-tab="add"><span class="qa-ic"><i class="fas fa-plus"></i></span>Catat</button>
-                                    <button class="qa" data-tab="wallets"><span class="qa-ic"><i class="fas fa-wallet"></i></span>Dompet</button>
-                                    <button class="qa" data-tab="goals"><span class="qa-ic"><i class="fas fa-bullseye"></i></span>Target</button>
-                                    <button class="qa" data-tab="debts"><span class="qa-ic"><i class="fas fa-hand-holding-usd"></i></span>Hutang</button>
+                                <div class="hero-ai-inline">
+                                    <div class="hero-ai-head">
+                                        <span class="ai-spark-sm">✦</span>
+                                        <span class="hero-ai-label">Asisten Keuangan AI</span>
+                                        <button class="btn btn-sm hero-ai-btn" id="aiInsightBtn"><i class="fas fa-wand-magic-sparkles"></i> Buat Ringkasan</button>
+                                    </div>
+                                    <div id="aiInsightContent" class="ai-insight ai-insight-empty">Dapatkan analisis singkat &amp; saran dari data keuanganmu — klik "Buat Ringkasan".</div>
                                 </div>
                             </div>
                         </div>
@@ -111,13 +110,7 @@
                         </div>
                     </div>
 
-                    <div class="card card-pad ai-card" style="margin-top: 28px;">
-                        <div class="card-head">
-                            <h2 class="card-title"><span class="ai-spark">✦</span> Asisten Keuangan AI</h2>
-                            <button class="btn btn-sm" id="aiInsightBtn"><i class="fas fa-wand-magic-sparkles"></i> Buat Ringkasan</button>
-                        </div>
-                        <div id="aiInsightContent" class="ai-insight ai-insight-empty">Dapatkan analisis singkat &amp; saran dari data keuanganmu — klik "Buat Ringkasan".</div>
-                    </div>
+
 
                     <div class="section-head">
                         <h2><i class="fas fa-wallet"></i> Dompet Saya</h2>
